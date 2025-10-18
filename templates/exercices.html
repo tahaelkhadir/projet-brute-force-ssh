@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP Kali Linux - Hydra, John, fail2ban, SSH</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
+    
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#preamble">Préambule</a></li>
+            <li><a href="#setup">Configuration Initiale</a></li>
+            <li><a href="#ex1">Exercice 1</a></li>
+            <li><a href="#ex2">Exercice 2</a></li>
+            <li><a href="#ex3">Exercice 3</a></li>
+            <li><a href="#ex4">Exercice 4</a></li>
+            <li><a href="#ex5">Exercice 5</a></li>
+            <li><a href="#restore">Restauration</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="glow">TP Kali Linux - Hydra, John, fail2ban, SSH</h1>
+
+        <!-- Préambule -->
+        <section id="preamble" class="card">
+            <h2 class="glow">Préambule & Sécurité</h2>
+            <ul>
+                <li>Exécuter ce TP uniquement sur une machine Kali isolée.</li>
+                <li>Utiliser uniquement les mots de passe pédagogiques fournis.</li>
+                <li>Ne pas attaquer de systèmes réels.</li>
+            </ul>
+        </section>
+
+        <!-- Configuration Initiale -->
+        <section id="setup" class="card">
+            <h2 class="glow">Configuration Initiale</h2>
+            <div class="terminal">
+<pre>
+sudo apt update && sudo apt install -y openssh-server john hydra fail2ban
+sudo systemctl enable --now ssh
+
+# Créer des utilisateurs test
+sudo useradd -m -s /bin/bash alice
+echo 'alice:password123' | sudo chpasswd
+
+sudo useradd -m -s /bin/bash bob
+echo 'bob:Summer2024!' | sudo chpasswd
+
+sudo useradd -m -s /bin/bash charlie
+echo 'charlie:Y7$g9Q!kL2#v' | sudo chpasswd
+</pre>
+            </div>
+        </section>
+
+        <!-- Exercice 1 -->
+        <section id="ex1" class="card">
+            <h2 class="glow">Exercice 1 - Préparer les données pour John</h2>
+            <div class="terminal">
+<pre>
+# Extraire les hachés des comptes test
+sudo awk -F: '/alice|bob|charlie/{print $1":"$2}' /etc/shadow &gt; ~/hashes_course.txt
+sudo chmod 600 ~/hashes_course.txt
+
+# Créer une wordlist pédagogique
+cat &gt; ~/wordlist_course.txt &lt;&lt;'EOF'
+password
+password123
+Summer2024!
+summer
+admin
+123456
+Y7$g9Q!kL2#v
+letmein
+qwerty
+EOF
+
+# Vérifier les fichiers
+ls -l ~/hashes_course.txt ~/wordlist_course.txt
+head -n 20 ~/hashes_course.txt
+</pre>
+            </div>
+        </section>
+
+        <!-- Exercice 2 -->
+        <section id="ex2" class="card">
+            <h2 class="glow">Exercice 2 - John the Ripper (hors-ligne)</h2>
+            <div class="terminal">
+<pre>
+# Casser les mots de passe avec wordlist
+john --wordlist=~/wordlist_course.txt ~/hashes_course.txt
+
+# Mode plus agressif avec règles
+john --wordlist=~/wordlist_course.txt --rules ~/hashes_course.txt
+
+# Afficher les mots de passe trouvés
+john --show ~/hashes_course.txt
+
+# Mesurer le temps de cassage
+time john --wordlist=~/wordlist_course.txt ~/hashes_course.txt
+</pre>
+            </div>
+        </section>
+
+        <!-- Exercice 3 -->
+        <section id="ex3" class="card">
+            <h2 class="glow">Exercice 3 - Hydra attaque SSH</h2>
+            <div class="terminal">
+<pre>
+# Attaque brute-force contre SSH
+hydra -l alice -P ~/wordlist_course.txt ssh://127.0.0.1 -t 4
+
+# Surveiller les logs SSH
+sudo tail -f /var/log/auth.log
+sudo grep 'Failed password' /var/log/auth.log | tail -n 50
+</pre>
+            </div>
+        </section>
+
+        <!-- Exercice 4 -->
+        <section id="ex4" class="card">
+            <h2 class="glow">Exercice 4 - Fail2ban</h2>
+            <div class="terminal">
+<pre>
+# Créer configuration locale fail2ban pour SSH
+sudo tee /etc/fail2ban/jail.d/ssh_local.conf &gt;/dev/null &lt;&lt;'EOF'
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+findtime = 600
+bantime = 3600
+action = iptables-multiport[name=sshd, port="ssh", protocol="tcp"]
+EOF
+
+# Redémarrer fail2ban et vérifier
+sudo systemctl restart fail2ban
+sudo fail2ban-client status sshd
+
+# Tester attaque Hydra
+hydra -l alice -P ~/wordlist_course.txt ssh://127.0.0.1
+
+# Vérifier IP bannie
+sudo fail2ban-client whois sshd 127.0.0.1
+</pre>
+            </div>
+        </section>
+
+        <!-- Exercice 5 -->
+        <section id="ex5" class="card">
+            <h2 class="glow">Exercice 5 - Authentification par clé SSH</h2>
+            <div class="terminal">
+<pre>
+# Générer paire de clés SSH
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_course -N ""
+
+# Installer la clé pour l'utilisateur bob
+sudo mkdir -p /home/bob/.ssh
+sudo cp ~/.ssh/id_ed25519_course.pub /home/bob/.ssh/authorized_keys
+sudo chown -R bob:bob /home/bob/.ssh
+sudo chmod 700 /home/bob/.ssh
+sudo chmod 600 /home/bob/.ssh/authorized_keys
+
+# Désactiver mot de passe pour SSH
+sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+
+# Tester connexion par clé
+ssh -i ~/.ssh/id_ed25519_course bob@127.0.0.1
+
+# Hydra échoue maintenant
+hydra -l bob -P ~/wordlist_course.txt ssh://127.0.0.1
+</pre>
+            </div>
+        </section>
+
+        <!-- Restauration -->
+        <section id="restore" class="card">
+            <h2 class="glow">Restauration</h2>
+            <div class="terminal">
+<pre>
+# Réactiver mot de passe SSH
+sudo sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sudo systemctl restart ssh
+
+# Supprimer utilisateurs test
+sudo deluser --remove-home alice
+sudo deluser --remove-home bob
+sudo deluser --remove-home charlie
+</pre>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

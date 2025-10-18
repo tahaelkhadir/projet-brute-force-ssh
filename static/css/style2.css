@@ -1,0 +1,261 @@
+/* === RESET === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: radial-gradient(circle at center, #000 60%, #001a0d 100%);
+    color: #00ff41;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.5s ease;
+}
+
+/* === EFFET MATRIX ARRIÈRE-PLAN === */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: repeating-linear-gradient(
+        0deg, rgba(0, 255, 65, 0.05) 0px, rgba(0, 255, 65, 0.05) 2px, transparent 2px, transparent 4px
+    );
+    animation: scan 5s linear infinite;
+    z-index: 0;
+}
+
+@keyframes scan {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+}
+
+/* === NAVIGATION === */
+nav {
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 2px solid #00ff41;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 0 25px #00ff4144;
+    transition: background 0.3s ease;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+}
+
+nav a {
+    color: #00ff41;
+    text-decoration: none;
+    font-size: 1.1rem;
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+nav a::after {
+    content: "_";
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+nav a:hover {
+    color: #00ffaa;
+    text-shadow: 0 0 15px #00ffaa, 0 0 25px #00ffaa66;
+}
+
+nav a:hover::after {
+    opacity: 1;
+    color: #00ffaa;
+}
+
+/* === TITRES === */
+h1 {
+    text-align: center;
+    margin: 2rem 0;
+    font-size: 2.5rem;
+    text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff4166;
+    border-bottom: 2px solid #00ff41;
+    padding-bottom: 1rem;
+    animation: blink 1.5s infinite;
+    z-index: 2;
+    transition: text-shadow 0.3s ease;
+}
+
+h1::before {
+    content: "root@system:~$ ";
+    color: #00ffaa;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* === CONTAINER === */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+/* === CARTES === */
+.card {
+    background: rgba(10, 25, 10, 0.95);
+    border: 1px solid #00ff41;
+    border-left: 4px solid #00ffaa;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    color: #d4ffd4;
+    box-shadow: 0 0 20px #00ff4144;
+    transition: all 0.4s ease-in-out;
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(0,255,65,0.15), transparent);
+    animation: scanline 2.5s linear infinite;
+}
+
+.card:hover {
+    transform: scale(1.05) rotateX(2deg);
+    box-shadow: 0 0 40px #00ffaa88, inset 0 0 25px #00ffaa44;
+}
+
+/* === TERMINAL === */
+.terminal {
+    background: #000;
+    border: 1px solid #00ff41;
+    border-radius: 8px;
+    padding: 1.5rem;
+    color: #00ff41;
+    margin: 1.5rem 0;
+    font-size: 1.05rem;
+    box-shadow: 0 0 25px #00ff4144;
+    position: relative;
+    overflow-x: auto;
+    transition: all 0.3s ease;
+}
+
+.terminal pre { white-space: pre-wrap; word-wrap: break-word; }
+
+.terminal::before {
+    content: "█";
+    color: #00ffaa;
+    animation: cursorBlink 1s infinite;
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* === GLOW TEXT === */
+.glow {
+    text-shadow: 0 0 8px #00ff41, 0 0 18px #00ffaa, 0 0 35px #00ffaa55;
+    transition: text-shadow 0.3s ease;
+}
+
+/* === TABLE === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: rgba(0, 10, 0, 0.85);
+    transition: all 0.3s ease;
+}
+
+th, td {
+    border: 1px solid #00ff41;
+    padding: 1rem;
+    transition: background 0.3s ease;
+}
+
+th {
+    background: rgba(0, 255, 65, 0.25);
+    color: #00ff88;
+    text-align: left;
+}
+
+/* === HOVER GLITCH === */
+.glitch {
+    position: relative;
+    color: #00ff41;
+    transition: color 0.3s ease;
+}
+
+.glitch:hover::before, .glitch:hover::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0; top: 0;
+    opacity: 0.8;
+}
+
+.glitch:hover::before {
+    color: #00ffaa;
+    transform: translate(-2px, 0);
+}
+
+.glitch:hover::after {
+    color: #00ff41;
+    transform: translate(2px, 0);
+}
+
+/* === LINKS, BUTTONS === */
+a, .btn {
+    color: #00ff41;
+    transition: color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0,0,0,0.65);
+    border: 1px solid #00ff41;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.btn:hover { color: #00ffaa; box-shadow: 0 0 18px #00ffaa55; }
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    h1 { font-size: 2rem; }
+    .card { padding: 1.8rem; }
+}
+
+/* === UTILITY === */
+.small { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+
+/* Ensure content sits above background effect */
+main, .container, nav, .card, .terminal { position: relative; }

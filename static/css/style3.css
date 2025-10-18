@@ -1,0 +1,198 @@
+/* === RESET === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: radial-gradient(circle at center, #000 60%, #001a0d 100%);
+    color: #00ff41;
+    overflow-x: hidden;
+}
+
+/* === EFFET MATRIX ARRIÈRE-PLAN === */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: repeating-linear-gradient(
+        0deg, rgba(0, 255, 65, 0.05) 0px, rgba(0, 255, 65, 0.05) 2px, transparent 2px, transparent 4px
+    );
+    animation: scan 5s linear infinite;
+    z-index: 0;
+}
+
+@keyframes scan {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+}
+
+/* === TITRES === */
+h1, h2, h3 {
+    font-family: 'Courier New', monospace;
+}
+
+h1 {
+    text-align: center;
+    margin: 2rem 0;
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px #00ff41, 0 0 30px #00ff4166;
+    border-bottom: 2px solid #00ff41;
+    padding-bottom: 1rem;
+    animation: blink 1.5s infinite;
+}
+
+h1::before {
+    content: "root@system:~$ ";
+    color: #00ffaa;
+}
+
+h2 {
+    margin-top: 2rem;
+    font-size: 1.8rem;
+    text-shadow: 0 0 10px #00ff41;
+    border-bottom: 1px solid #00ff41;
+    padding-bottom: 0.5rem;
+}
+
+h3 {
+    margin-top: 1.5rem;
+    font-size: 1.4rem;
+    text-shadow: 0 0 5px #00ff41;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* === CONTAINER === */
+div {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* === PARAGRAPHES ET LISTES === */
+p, li {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: #d4ffd4;
+}
+
+ul {
+    list-style: disc inside;
+    margin: 1rem 0;
+}
+
+/* === CARTES POUR SECTIONS === */
+.card {
+    background: rgba(10, 25, 10, 0.9);
+    border: 1px solid #00ff41;
+    border-left: 4px solid #00ffaa;
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 2rem 0;
+    color: #d4ffd4;
+    box-shadow: 0 0 15px #00ff4144;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(0,255,65,0.1), transparent);
+    animation: scanline 3s linear infinite;
+}
+
+@keyframes scanline {
+    0% { top: -100%; }
+    100% { top: 100%; }
+}
+
+.card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 30px #00ffaa88, inset 0 0 20px #00ffaa33;
+}
+
+/* === TERMINAL POUR COMMANDES === */
+pre {
+    background: #000;
+    border: 1px solid #00ff41;
+    border-radius: 6px;
+    padding: 1.2rem;
+    color: #00ff41;
+    margin: 1.5rem 0;
+    font-size: 1rem;
+    box-shadow: 0 0 20px #00ff4144;
+    position: relative;
+    overflow-x: auto;
+}
+
+pre::before {
+    content: "█";
+    color: #00ffaa;
+    animation: cursorBlink 1s infinite;
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* === TABLE === */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: rgba(0, 10, 0, 0.8);
+}
+
+th, td {
+    border: 1px solid #00ff41;
+    padding: 1rem;
+}
+
+th {
+    background: rgba(0, 255, 65, 0.2);
+    color: #00ff88;
+}
+
+/* === LIENS === */
+a {
+    color: #00ff41;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+a:hover {
+    color: #00ffaa;
+    text-shadow: 0 0 10px #00ffaa;
+}
+
+/* === GLOW TEXT === */
+.glow {
+    text-shadow: 0 0 5px #00ff41, 0 0 15px #00ffaa, 0 0 25px #00ffaa55;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.2rem; }
+    div { padding: 1rem; }
+}

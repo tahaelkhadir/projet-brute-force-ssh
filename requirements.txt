@@ -1,0 +1,11 @@
+Flask==3.0.0
+gunicorn==21.2.0
+```
+
+### 1.2 - Créer le fichier `Procfile`
+
+Créez un **nouveau fichier** appelé `Procfile` (sans extension) à la racine de votre projet, au même niveau que `app.py`.
+
+Contenu du fichier `Procfile` :
+```
+web: gunicorn app:app

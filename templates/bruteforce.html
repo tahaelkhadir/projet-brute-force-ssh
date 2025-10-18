@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brute Force SSH - Présentation Complète</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="/bruteforce">🔓 Brute Force</a></li>
+            <li><a href="/exercices">💻 Exercices</a></li>
+            <li><a href="/sources">📚 Sources</a></li>
+            <li><a href="/contact">📧 Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Contenu Principal -->
+    <div class="container">
+        <!-- Titre principal -->
+        <h1>Qu'est-ce que le Brute Force ?</h1>
+
+        <!-- Introduction -->
+        <div class="card">
+            <h2> Définition</h2>
+            <p style="font-size: 1.2rem; line-height: 1.8;">
+                Une <strong style="color: #00ff41;">attaque brute force</strong> (force brute) est une méthode de piratage qui teste systématiquement 
+                toutes les combinaisons possibles de mots de passe jusqu'à trouver le bon.
+            </p>
+            <p style="margin-top: 1rem; font-size: 1.1rem;">
+                C'est comme un voleur qui essaie toutes les clés d'un trousseau géant jusqu'à trouver celle qui ouvre la porte. 
+                La différence ? <strong style="color: #ff0040;">Un ordinateur peut tester des MILLIONS de combinaisons par seconde !</strong>
+            </p>
+
+            <div class="terminal" style="margin-top: 1.5rem;">
+                <code># Exemple d'une attaque brute force
+Tentative 1 : password → ÉCHEC
+Tentative 2 : 123456 → ÉCHEC
+Tentative 3 : admin → ÉCHEC
+Tentative 4 : letmein → ÉCHEC
+...
+Tentative 847 : password123 → ✅ SUCCÈS !
+
+Temps écoulé : 2 minutes 34 secondes</code>
+            </div>
+        </div>
+
+        <!-- À quoi ça sert -->
+        <div class="card">
+            <h2>🔧 À Quoi Sert le Brute Force ?</h2>
+            
+            <div class="grid">
+                <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border-radius: 8px;">
+                    <h3 style="color: #00ff41;">✅ Utilisation Légitime</h3>
+                    <ul>
+                        <li><strong>Tests de sécurité :</strong> Vérifier la robustesse des mots de passe</li>
+                        <li><strong>Pentesting :</strong> Audits de sécurité autorisés</li>
+                        <li><strong>Récupération :</strong> Retrouver un mot de passe oublié (fichiers personnels)</li>
+                        <li><strong>Recherche :</strong> Études en cybersécurité</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(255,0,64,0.1); padding: 1.5rem; border-radius: 8px;">
+                    <h3 style="color: #ff0040;">❌ Utilisation Malveillante</h3>
+                    <ul>
+                        <li><strong>Piratage :</strong> Accès non autorisé aux comptes</li>
+                        <li><strong>Vol de données :</strong> Pénétration de serveurs</li>
+                        <li><strong>Espionnage :</strong> Surveillance illégale</li>
+                        <li><strong>Sabotage :</strong> Destruction de systèmes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-danger" style="margin-top: 1rem;">
+                <strong> ATTENTION LÉGALE :</strong> L'utilisation du brute force sur des systèmes sans autorisation est ILLÉGALE. 
+                En France, vous risquez jusqu'à <strong>5 ans de prison et 150 000€ d'amende</strong> (Code pénal, articles 323-1).
+            </div>
+        </div>
+
+        <!-- Comment les hackers exploitent -->
+        <div class="card">
+            <h2>👾 Comment les Hackers Exploitent le Brute Force</h2>
+
+            <h3>Étape 1 : Reconnaissance de la Cible </h3>
+            <p>Le hacker commence par identifier sa victime et collecter des informations.</p>
+            <div class="terminal">
+                <code># Scanner les ports ouverts
+nmap -p 22 192.168.1.0/24
+# Résultat : Liste des serveurs SSH accessibles
+
+# Identifier la version SSH
+nmap -sV 192.168.1.100
+# Résultat : OpenSSH 7.9 (version vulnérable ?)</code>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Étape 2 : Préparation des Outils 🔧</h3>
+            <p>Le hacker télécharge des outils spécialisés et des listes de mots de passe.</p>
+            <div class="terminal">
+                <code># Installer Hydra (outil d'attaque)
+sudo apt install hydra
+
+# Télécharger rockyou.txt (14 millions de mots de passe)
+wget https://github.com/.../rockyou.txt
+
+# Créer une liste personnalisée
+cat > custom.txt << EOF
+admin
+admin123
+password
+company_name
+CEO_lastname
+EOF</code>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Étape 3 : Lancement de l'Attaque 🚀</h3>
+            <div class="terminal">
+                <code># Attaque brute force avec Hydra
+hydra -l admin -P rockyou.txt ssh://192.168.1.100 -t 16 -V
+
+# Explication :
+# -l admin              → Nom d'utilisateur cible
+# -P rockyou.txt        → Fichier de 14 millions de mots de passe
+# -t 16                 → 16 connexions parallèles (RAPIDE !)
+# -V                    → Afficher chaque tentative
+
+# Résultat après 3 minutes :
+[22][ssh] host: 192.168.1.100   login: admin   password: Admin2024!
+✅ MOT DE PASSE TROUVÉ !</code>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Étape 4 : Exploitation de l'Accès 💀</h3>
+            <p>Une fois connecté, le hacker peut faire BEAUCOUP de dégâts :</p>
+            <ul style="margin-top: 1rem;">
+                <li><strong>Vol de données :</strong> Télécharger tous les fichiers sensibles</li>
+                <li><strong>Installation de backdoors :</strong> Maintenir l'accès même après changement de mot de passe</li>
+                <li><strong>Déploiement de ransomware :</strong> Chiffrer les données et demander une rançon</li>
+                <li><strong>Propagation :</strong> Utiliser ce serveur pour attaquer d'autres cibles</li>
+                <li><strong>Destruction :</strong> Supprimer les logs et effacer les traces</li>
+            </ul>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="card">
+            <h2> Statistiques Choquantes sur le Brute Force</h2>
+            
+            <div class="grid">
+                <div class="stat-box">
+                    <div class="stat-number">81%</div>
+                    <p style="margin-top: 1rem;">des piratages sont dus à des mots de passe faibles ou volés</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">2 min</div>
+                    <p style="margin-top: 1rem;">pour craquer un mot de passe de 6 caractères (chiffres seulement)</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">14M</div>
+                    <p style="margin-top: 1rem;">de mots de passe dans la liste rockyou.txt (la plus populaire)</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">65%</div>
+                    <p style="margin-top: 1rem;">des gens réutilisent le même mot de passe partout</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">300M</div>
+                    <p style="margin-top: 1rem;">d'attaques brute force par jour dans le monde</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">30 sec</div>
+                    <p style="margin-top: 1rem;">temps moyen pour craquer "password123"</p>
+                </div>
+            </div>
+
+            <div class="alert alert-warning" style="margin-top: 2rem;">
+                <strong>💡 Fait intéressant :</strong> Le mot de passe le plus utilisé dans le monde en 2024 est toujours "123456", 
+                suivi de "password" et "123456789". Ces mots de passe peuvent être craqués en moins d'1 seconde !
+            </div>
+        </div>
+
+        <!-- Types de Brute Force -->
+        <div class="card">
+            <h2>🔀 Les Différents Types de Brute Force</h2>
+
+            <h3>1️⃣ Brute Force Simple (Exhaustif)</h3>
+            <p><strong>Méthode :</strong> Tester TOUTES les combinaisons possibles, de A à Z</p>
+            <div class="terminal">
+                <code># Exemple de progression :
+a, b, c, ..., z
+aa, ab, ac, ..., zz
+aaa, aab, aac, ..., zzz
+aaaa, aaab, aaac, ...
+
+# Pour un mot de passe de 8 caractères (minuscules) :
+26^8 = 208 milliards de combinaisons
+Temps : Plusieurs années avec un PC normal</code>
+            </div>
+            <p><strong>Avantage :</strong> Trouve TOUT mot de passe (si on a le temps)</p>
+            <p><strong>Inconvénient :</strong> Extrêmement lent</p>
+
+            <h3 style="margin-top: 2rem;">2️⃣ Attaque par Dictionnaire</h3>
+            <p><strong>Méthode :</strong> Utiliser une liste de mots de passe courants</p>
+            <div class="terminal">
+                <code># Liste typique de dictionnaire :
+password
+123456
+qwerty
+admin
+letmein
+welcome
+monkey
+dragon
+master
+...
+
+# Avec rockyou.txt : 14 343 296 mots de passe !
+# Temps : Quelques minutes à quelques heures</code>
+            </div>
+            <p><strong>Avantage :</strong> Rapide et très efficace (80% de succès)</p>
+            <p><strong>Inconvénient :</strong> Ne trouve pas les mots de passe complexes</p>
+
+            <h3 style="margin-top: 2rem;">3️⃣ Attaque Hybride</h3>
+            <p><strong>Méthode :</strong> Dictionnaire + variations (chiffres, symboles, majuscules)</p>
+            <div class="terminal">
+                <code># Transformations appliquées :
+password → password1, password123, Password!, PASSWORD
+admin → admin1, admin2024, Admin!, @dmin
+hello → hello!, hello123, H3ll0, HELLO
+
+# Règles de transformation :
+- Ajouter des chiffres à la fin
+- Remplacer des lettres (o → 0, a → @, e → 3)
+- Mettre la première lettre en majuscule
+- Ajouter des symboles (!@#$%)</code>
+            </div>
+            <p><strong>Avantage :</strong> Excellent compromis vitesse/efficacité</p>
+            <p><strong>Inconvénient :</strong> Nécessite plus de temps qu'une simple attaque par dictionnaire</p>
+
+            <h3 style="margin-top: 2rem;">4️⃣ Rainbow Table Attack</h3>
+            <p><strong>Méthode :</strong> Utiliser des tables pré-calculées de hash</p>
+            <div class="terminal">
+                <code># Principe :
+# Au lieu de calculer le hash à chaque fois,
+# on utilise une table déjà prête :
+
+Hash MD5                          Mot de passe
+5f4dcc3b5aa765d61d8327deb882cf99  password
+e10adc3949ba59abbe56e057f20f883e  123456
+25f9e794323b453885f5181f1b624d0b  123456789
+
+# Avantage : TRÈS rapide (recherche instantanée)
+# Inconvénient : Fichiers énormes (plusieurs GB)</code>
+            </div>
+            <p><strong>Avantage :</strong> Instantané une fois la table créée</p>
+            <p><strong>Inconvénient :</strong> Nécessite beaucoup d'espace disque, inefficace avec le salt</p>
+
+            <h3 style="margin-top: 2rem;">5️⃣ Credential Stuffing</h3>
+            <p><strong>Méthode :</strong> Utiliser des identifiants volés lors de fuites de données</p>
+            <div class="terminal">
+                <code># Principe :
+# Les hackers utilisent des millions d'identifiants
+# volés lors de précédentes attaques
+
+# Exemple de liste :
+user1@gmail.com:password123
+admin@company.com:Admin2024!
+john.doe@email.com:Qwerty123
+
+# Testé automatiquement sur des milliers de sites
+# Succès grâce à la réutilisation des mots de passe</code>
+            </div>
+            <p><strong>Avantage :</strong> Très efficace (les gens réutilisent leurs mots de passe)</p>
+            <p><strong>Inconvénient :</strong> Nécessite d'obtenir des listes de fuites de données</p>
+        </div>
+
+        <!-- John the Ripper -->
+        <div class="card">
+            <h2> John the Ripper - L'Outil de Référence</h2>
+
+            <h3>Qu'est-ce que John the Ripper ?</h3>
+            <p>John the Ripper (ou simplement "John") est l'un des outils de cracking de mots de passe les plus puissants et populaires au monde. Contrairement à Hydra qui attaque des connexions en ligne, John casse des mots de passe <strong>hachés</strong> (cryptés).</p>
+
+            <h3 style="margin-top: 2rem;">Comment ça fonctionne ?</h3>
+            <div class="terminal">
+                <code># 1. Obtenir le hash du mot de passe
+# Exemple de hash SHA-256 :
+5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
+
+# 2. Lancer John avec un dictionnaire
+john --wordlist=rockyou.txt hash.txt
+
+# 3. John teste chaque mot, le hash, et compare :
+password       → 5e884898... ❌
+123456         → e10adc39... ❌
+password123    → 482c811d... ✅ TROUVÉ !
+
+# Temps : 30 secondes à quelques heures</code>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Les Modes de John the Ripper</h3>
+            <div class="grid" style="margin-top: 1rem;">
+                <div style="background: rgba(0,255,65,0.05); padding: 1rem; border: 1px solid #00ff41; border-radius: 8px;">
+                    <h4 style="color: #00ff41;">Mode Wordlist</h4>
+                    <p style="margin-top: 0.5rem;">Utilise un dictionnaire de mots de passe</p>
+                    <div class="terminal" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                        <code>john --wordlist=rockyou.txt hash.txt</code>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,255,65,0.05); padding: 1rem; border: 1px solid #00ff41; border-radius: 8px;">
+                    <h4 style="color: #00ff41;">Mode Single</h4>
+                    <p style="margin-top: 0.5rem;">Utilise les infos du compte (nom, email)</p>
+                    <div class="terminal" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                        <code>john --single hash.txt</code>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,255,65,0.05); padding: 1rem; border: 1px solid #00ff41; border-radius: 8px;">
+                    <h4 style="color: #00ff41;">Mode Incremental</h4>
+                    <p style="margin-top: 0.5rem;">Teste toutes les combinaisons possibles</p>
+                    <div class="terminal" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                        <code>john --incremental hash.txt</code>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Puissance de John the Ripper</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type de Hash</th>
+                        <th>Vitesse (hash/seconde)</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MD5</td>
+                        <td>~100 millions</td>
+                        <td>Très rapide</td>
+                    </tr>
+                    <tr>
+                        <td>SHA-256</td>
+                        <td>~10 millions</td>
+                        <td>Rapide</td>
+                    </tr>
+                    <tr>
+                        <td>bcrypt</td>
+                        <td>~50 000</td>
+                        <td>Lent (sécurisé)</td>
+                    </tr>
+                    <tr>
+                        <td>SHA-512 (Linux)</td>
+                        <td>~1 million</td>
+                        <td>Moyen</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-info" style="margin-top: 1rem;">
+                <strong>💡 Note :</strong> Ces vitesses sont pour un CPU moderne. Avec un GPU (carte graphique), 
+                les vitesses peuvent être multipliées par 100 !
+            </div>
+        </div>
+
+        <!-- Dictionnaires -->
+        <div class="card">
+            <h2>Les Dictionnaires (Wordlists) Utilisés pour le Brute Force</h2>
+
+            <h3>Qu'est-ce qu'une Wordlist ?</h3>
+            <p>Une wordlist (liste de mots) est un fichier texte contenant des millions de mots de passe possibles, un par ligne. Les hackers (et les testeurs de sécurité) utilisent ces listes pour accélérer les attaques brute force.</p>
+
+            <h3 style="margin-top: 2rem;">Les Wordlists Les Plus Populaires</h3>
+
+            <div class="grid">
+                <div style="background: rgba(255,0,64,0.1); padding: 1.5rem; border: 2px solid #ff0040; border-radius: 8px;">
+                    <h4 style="color: #ff0040;">🔴 RockYou.txt</h4>
+                    <p style="margin-top: 0.5rem;"><strong>Taille :</strong> 133 MB</p>
+                    <p><strong>Contenu :</strong> 14 343 296 mots de passe</p>
+                    <p><strong>Origine :</strong> Fuite de données RockYou (2009)</p>
+                    <p><strong>Popularité :</strong> La PLUS utilisée au monde</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Cette liste contient des vrais mots de passe volés. C'est pourquoi elle est si efficace !</p>
+                </div>
+
+                <div style="background: rgba(0,255,65,0.1); padding: 1.5rem; border: 2px solid #00ff41; border-radius: 8px;">
+                    <h4 style="color: #00ff41;">🟢 SecLists</h4>
+                    <p style="margin-top: 0.5rem;"><strong>Taille :</strong> Variable (centaines de listes)</p>
+                    <p><strong>Contenu :</strong> Listes spécialisées par catégorie</p>
+                    <p><strong>Origine :</strong> Compilation communautaire</p>
+                    <p><strong>Utilisation :</strong> Tests de pénétration professionnels</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Contient des listes pour noms d'utilisateurs, passwords, URLs, etc.</p>
+                </div>
+
+                <div style="background: rgba(255,157,0,0.1); padding: 1.5rem; border: 2px solid #ff9d00; border-radius: 8px;">
+                    <h4 style="color: #ff9d00;">🟠 Crackstation</h4>
+                    <p style="margin-top: 0.5rem;"><strong>Taille :</strong> 15 GB !</p>
+                    <p><strong>Contenu :</strong> 1,5 milliard de mots de passe</p>
+                    <p><strong>Origine :</strong> Compilation de multiples fuites</p>
+                    <p><strong>Utilisation :</strong> Attaques avancées</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Énorme, mais extrêmement efficace. Nécessite beaucoup d'espace disque.</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Exemple de Contenu d'une Wordlist</h3>
+            <div class="terminal">
+                <code># Top 20 des mots de passe les plus courants (rockyou.txt) :
+123456
+password
+12345678
+qwerty
+123456789
+12345
+1234
+111111
+1234567
+dragon
+123123
+baseball
+iloveyou
+trustno1
+1234567890
+sunshine
+master
+123321
+666666
+qwertyuiop</code>
+            </div>
+
+            <h3 style="margin-top: 2rem;">Comment Créer sa Propre Wordlist Ciblée</h3>
+            <div class="terminal">
+                <code># Méthode 1 : Combiner plusieurs listes
+cat rockyou.txt passwords.txt custom.txt > big_wordlist.txt
+
+# Méthode 2 : Générer des variations avec Crunch
+crunch 8 8 -t password@@@@ > wordlist.txt
+# Génère : password0000, password0001, ..., password9999
+
+# Méthode 3 : Créer une liste personnalisée
+cat > targeted_wordlist.txt << EOF
+CompanyName2024
+CompanyName!
+AdminCompany
+CompanyAdmin
+Company@2024
+EOF
+
+# Méthode 4 : Extraire des mots d'un site web
+cewl https://target-company.com -w company_wordlist.txt</code>
+            </div>
+
+            <div class="alert alert-warning" style="margin-top: 1.5rem;">
+                <strong> Conseil de sécurité :</strong> Ne JAMAIS utiliser un mot de passe qui pourrait être dans une wordlist ! 
+                Vérifiez sur <a href="https://haveibeenpwned.com" style="color: #ff9d00;">haveibeenpwned.com</a> 
+                si votre mot de passe a déjà été compromis.
+            </div>
+
+            <h3 style="margin-top: 2rem;">Où Télécharger ces Wordlists ?</h3>
+            <div class="terminal">
+                <code># RockYou (sur Kali Linux)
+/usr/share/wordlists/rockyou.txt
+
+# RockYou (téléchargement)
+wget https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
+
+# SecLists
+git clone https://github.com/danielmiessler/SecLists.git
+
+# Crackstation
+# Télécharger depuis : https://crackstation.net/crackstation-wordlist-password-cracking-dictionary.htm</code>
+            </div>
+        </div>
+
+        <!-- Temps de craquage -->
+        <div class="card">
+            <h2>⏱️ Tableau : Temps pour Craquer un Mot de Passe</h2>
+            <p>Voici combien de temps il faut pour craquer un mot de passe selon sa complexité :</p>
+
+            <table style="margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Longueur</th>
+                        <th>Minuscules seules</th>
+                        <th>Min + Maj</th>
+                        <th>Min + Maj + Chiffres</th>
+                        <th>Tous caractères</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>4 caractères</td>
+                        <td style="color: #ff0040;">Instantané</td>
+                        <td style="color: #ff0040;">Instantané</td>
+                        <td style="color: #ff0040;">Instantané</td>
+                        <td style="color: #ff9d00;">1 seconde</td>
+                    </tr>
+                    <tr>
+                        <td>6 caractères</td>
+                        <td style="color: #ff0040;">1 seconde</td>
+                        <td style="color: #ff9d00;">10 secondes</td>
+                        <td style="color: #ff9d00;">1 minute</td>
+                        <td style="color: #00ff41;">5 minutes</td>
+                    </tr>
+                    <tr>
+                        <td>8 caractères</td>
+                        <td style="color: #ff9d00;">2 minutes</td>
+                        <td style="color: #ff9d00;">3 heures</td>
+                        <td style="color: #00ff41;">2 jours</td>
+                        <td style="color: #00ff41;">3 semaines</td>
+                    </tr>
+                    <tr>
+                        <td>10 caractères</td>
+                        <td style="color: #00ff41;">3 heures</td>
+                        <td style="color: #00ff41;">6 mois</td>
+                        <td style="color: #00ff41;">10 ans</td>
+                        <td style="color: #00ff41;">200 ans</td>
+                    </tr>
+                    <tr>
+                        <td>12 caractères</td>
+                        <td style="color: #00ff41;">2 ans</td>
+                        <td style="color: #00ff41;">2000 ans</td>
+                        <td style="color: #00ff41;">200 000 ans</td>
+                        <td style="color: #00ff41;">30 millions d'années</td>
+                    </tr>
+                    <tr style="background: rgba(0,255,65,0.2);">
+                        <td><strong>14+ caractères</strong></td>
+                        <td colspan="4" style="text-align: center;"><strong style="color: #00ff41;">PRATIQUEMENT IMPOSSIBLE</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-info" style="margin-top: 1rem;">
+                <strong>💡 Note :</strong> Ces temps sont calculés pour un PC moderne avec un CPU standard. 
+                Avec un supercalculateur ou des fermes de GPU, ces temps peuvent être divisés par 1000 !
+            </div>
+        </div>
+
+        <!-- Conclusion -->
+        <div class="card" style="background: linear-gradient(135deg, rgba(0,255,65,0.15) 0%, rgba(255,0,64,0.15) 100%); border: 3px solid #00ff41;">
+            <h2 style="text-align: center;">🎯 Conclusion</h2>
+            <p style="font-size: 1.2rem; text-align: center; margin: 1rem 0;">
+                Le brute force est une menace réelle et dangereuse. La meilleure défense est un mot de passe FORT 
+                (14+ caractères avec tous types de caractères) ou encore mieux : <strong>l'authentification par clé SSH</strong>.
+            </p>
+            <p style="text-align: center; margin-top: 2rem; font-size: 1.1rem;">
+                🚀 <a href="/exercices" style="color: #00ff41; text-decoration: underline;">Découvrez nos exercices pratiques</a> pour apprendre à vous protéger !
+            </p>
+        </div>
+    </div>
+
+    <!-- JavaScript pour effets -->
+    <script>
+        // Animation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('%c[SYSTEM] Brute Force page loaded', 'color: #00ff41; font-weight: bold;');
+            
+            // Effet hover sur les cartes
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.transition = 'transform 0.3s';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

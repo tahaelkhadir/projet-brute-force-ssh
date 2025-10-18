@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sources et Ressources</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style3.css') }}">
+</head>
+<body>
+
+<div>
+    <h1>📚 Sources et Ressources</h1>
+    
+    <p>
+        Cette page regroupe toutes les ressources utilisées et recommandées pour approfondir vos connaissances 
+        en cybersécurité et sur la prévention des attaques brute force.
+    </p>
+
+    <!-- Documentation Officielle -->
+    <h2>📖 Documentation Officielle</h2>
+    <div>
+        <h3>Hydra</h3>
+        <p><strong>Description :</strong> Outil de cracking de connexion réseau rapide et flexible</p>
+        <p><strong>Site officiel :</strong> <a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank">github.com/vanhauser-thc/thc-hydra</a></p>
+        <p><strong>Documentation :</strong> man hydra ou hydra -h</p>
+
+        <h3>John the Ripper</h3>
+        <p><strong>Description :</strong> Outil de cracking de mots de passe hachés open-source</p>
+        <p><strong>Site officiel :</strong> <a href="https://www.openwall.com/john/" target="_blank">www.openwall.com/john</a></p>
+        <p><strong>Documentation :</strong> <a href="https://github.com/openwall/john" target="_blank">github.com/openwall/john</a></p>
+
+        <h3>Fail2ban</h3>
+        <p><strong>Description :</strong> Système de prévention d'intrusion pour bannir les IP suspectes</p>
+        <p><strong>Site officiel :</strong> <a href="https://www.fail2ban.org/" target="_blank">www.fail2ban.org</a></p>
+        <p><strong>Documentation :</strong> <a href="https://github.com/fail2ban/fail2ban" target="_blank">github.com/fail2ban/fail2ban</a></p>
+
+        <h3>OpenSSH</h3>
+        <p><strong>Description :</strong> Suite d'outils de connectivité réseau sécurisée</p>
+        <p><strong>Site officiel :</strong> <a href="https://www.openssh.com/" target="_blank">www.openssh.com</a></p>
+        <p><strong>Documentation :</strong> man sshd_config</p>
+    </div>
+
+    <!-- Wordlists -->
+    <h2>📝 Wordlists (Dictionnaires)</h2>
+    <h3>RockYou</h3>
+    <p><strong>Description :</strong> L'une des wordlists les plus populaires (14 millions de mots de passe réels)</p>
+    <p><strong>Emplacement sur Kali Linux :</strong> /usr/share/wordlists/rockyou.txt</p>
+    <p><strong>Téléchargement :</strong> Disponible via sudo apt install wordlists sur Debian/Ubuntu</p>
+
+    <h3>SecLists</h3>
+    <p><strong>Description :</strong> Collection complète de listes pour les tests de sécurité</p>
+    <p><strong>GitHub :</strong> <a href="https://github.com/danielmiessler/SecLists" target="_blank">github.com/danielmiessler/SecLists</a></p>
+
+    <!-- Tutoriels et Guides -->
+    <h2>🎓 Tutoriels et Guides</h2>
+    <ul>
+        <li><strong>ANSSI :</strong> <a href="https://www.ssi.gouv.fr/" target="_blank">www.ssi.gouv.fr</a> - Recommandations de sécurité officielles</li>
+        <li><strong>OWASP :</strong> <a href="https://owasp.org/" target="_blank">owasp.org</a> - Ressources sur la sécurité des applications</li>
+        <li><strong>HackTheBox :</strong> <a href="https://www.hackthebox.com/" target="_blank">www.hackthebox.com</a></li>
+        <li><strong>TryHackMe :</strong> <a href="https://tryhackme.com/" target="_blank">tryhackme.com</a></li>
+    </ul>
+
+    <!-- Livres Recommandés -->
+    <h2>📖 Livres Recommandés</h2>
+    <h3>The Art of Intrusion</h3>
+    <p><strong>Auteur :</strong> Kevin Mitnick</p>
+    <p>Histoires réelles d'attaques et de techniques de hacking</p>
+
+    <h3>Penetration Testing</h3>
+    <p><strong>Auteur :</strong> Georgia Weidman</p>
+    <p>Guide pratique des tests d'intrusion</p>
+
+    <h3>Hacking: The Art of Exploitation</h3>
+    <p><strong>Auteur :</strong> Jon Erickson</p>
+    <p>Introduction technique au hacking</p>
+
+    <!-- Commandes Utiles -->
+    <h2>⚡ Commandes Utiles - Aide-mémoire</h2>
+    <pre>
+# Hydra - Tests SSH
+hydra -l user -P pass.txt ssh://IP
+hydra -L users.txt -P pass.txt ssh://IP -t 4
+
+# John the Ripper - Cracking
+john --wordlist=rockyou.txt hash.txt
+john --show hash.txt
+
+# Fail2ban - Gestion
+sudo fail2ban-client status
+sudo fail2ban-client status sshd
+sudo fail2ban-client set sshd unbanip IP
+
+# SSH - Génération de clés
+ssh-keygen -t rsa -b 4096
+ssh-copy-id user@server
+
+# Logs SSH
+sudo tail -f /var/log/auth.log
+sudo journalctl -u ssh -f
+    </pre>
+
+    <!-- Réglementation et Éthique -->
+    <h2>⚖️ Réglementation et Éthique</h2>
+    <p><strong>IMPORTANT :</strong> Les outils présentés sont destinés à un usage éducatif et à des tests de sécurité autorisés uniquement.</p>
+    <ul>
+        <li>❌ N'utilisez JAMAIS ces outils sur des systèmes sans autorisation écrite</li>
+        <li>❌ Les attaques non autorisées sont illégales</li>
+        <li>✅ Utilisez ces outils uniquement dans un environnement de test contrôlé</li>
+        <li>✅ Respectez toujours la loi et l'éthique professionnelle</li>
+    </ul>
+    <p><strong>Peine encourue :</strong> Jusqu'à 5 ans d'emprisonnement et 150 000€ d'amende pour accès frauduleux à un système informatique.</p>
+
+    <!-- Références Académiques -->
+    <h2>🎓 Références Académiques</h2>
+    <ul>
+        <li>NIST Special Publication 800-63B - Digital Identity Guidelines (Authentication)</li>
+        <li>RFC 4252 - The Secure Shell (SSH) Authentication Protocol</li>
+        <li>OWASP Authentication Cheat Sheet</li>
+        <li>CWE-307: Improper Restriction of Excessive Authentication Attempts</li>
+    </ul>
+
+    <!-- Contact -->
+    <h2>💬 Questions ou Suggestions ?</h2>
+    <p>N'hésitez pas à nous contacter pour toute question ou amélioration</p>
+    <p><a href="/contact">Contactez-nous</a></p>
+
+</div>
+
+</body>
+</html>
