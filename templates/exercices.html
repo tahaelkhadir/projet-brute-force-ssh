@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TP Kali Linux - Hydra, John, fail2ban, SSH</title>
-     <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
 </head>
 <body>
     <nav>
@@ -26,46 +25,94 @@
 
         <!-- Préambule -->
         <section id="preamble" class="card">
-            <h2 class="glow">Préambule & Sécurité</h2>
+            <h2 class="glow">⚠️ Préambule & Sécurité</h2>
+            <h3>ATTENTION : Ce TP est à des fins éducatives uniquement !</h3>
             <ul>
-                <li>Exécuter ce TP uniquement sur une machine Kali isolée.</li>
-                <li>Utiliser uniquement les mots de passe pédagogiques fournis.</li>
-                <li>Ne pas attaquer de systèmes réels.</li>
+                <li>✅ Exécuter uniquement sur une machine Kali Linux isolée</li>
+                <li>✅ Utiliser uniquement les mots de passe pédagogiques fournis</li>
+                <li>❌ Ne JAMAIS attaquer de systèmes réels</li>
+                <li>❌ Ne pas utiliser ces techniques en dehors d'un environnement de test contrôlé</li>
             </ul>
         </section>
 
         <!-- Configuration Initiale -->
         <section id="setup" class="card">
-            <h2 class="glow">Configuration Initiale</h2>
+            <h2 class="glow">📋 Configuration Initiale</h2>
+            
+            <h3>0.1 - Mettre à jour le système</h3>
             <div class="terminal">
-<pre>
-sudo apt update && sudo apt install -y openssh-server john hydra fail2ban
-sudo systemctl enable --now ssh
-
-# Créer des utilisateurs test
-sudo useradd -m -s /bin/bash alice
-echo 'alice:password123' | sudo chpasswd
-
-sudo useradd -m -s /bin/bash bob
-echo 'bob:Summer2024!' | sudo chpasswd
-
-sudo useradd -m -s /bin/bash charlie
-echo 'charlie:Y7$g9Q!kL2#v' | sudo chpasswd
-</pre>
+<pre>sudo apt update</pre>
             </div>
+            <p><strong>Résultat attendu :</strong> Liste des paquets disponibles pour mise à jour</p>
+
+            <h3>0.2 - Installer les outils nécessaires</h3>
+            <div class="terminal">
+<pre>sudo apt install -y openssh-server john hydra fail2ban</pre>
+            </div>
+            <p><strong>Description des outils :</strong></p>
+            <ul>
+                <li><code>openssh-server</code> : Serveur SSH</li>
+                <li><code>john</code> : John the Ripper (casseur de mots de passe)</li>
+                <li><code>hydra</code> : Outil de brute force</li>
+                <li><code>fail2ban</code> : Protection contre les attaques par force brute</li>
+            </ul>
+
+            <h3>0.3 - Activer et démarrer SSH</h3>
+            <div class="terminal">
+<pre>sudo systemctl enable ssh
+sudo systemctl start ssh</pre>
+            </div>
+            <p><strong>Vérifier que SSH fonctionne :</strong></p>
+            <div class="terminal">
+<pre>sudo systemctl status ssh</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> "active (running)" en vert</p>
+
+            <h3>0.4 - Créer les utilisateurs de test</h3>
+            <p><strong>Créer l'utilisateur Alice :</strong></p>
+            <div class="terminal">
+<pre>sudo useradd -m -s /bin/bash alice
+echo 'alice:password123' | sudo chpasswd</pre>
+            </div>
+
+            <p><strong>Créer l'utilisateur Bob :</strong></p>
+            <div class="terminal">
+<pre>sudo useradd -m -s /bin/bash bob
+echo 'bob:Summer2024!' | sudo chpasswd</pre>
+            </div>
+
+            <p><strong>Créer l'utilisateur Charlie :</strong></p>
+            <div class="terminal">
+<pre>sudo useradd -m -s /bin/bash charlie
+echo 'charlie:Y7$g9Q!kL2#v' | sudo chpasswd</pre>
+            </div>
+
+            <p><strong>Vérifier la création des utilisateurs :</strong></p>
+            <div class="terminal">
+<pre>cat /etc/passwd | grep -E "alice|bob|charlie"</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> 3 lignes affichant les informations des utilisateurs créés</p>
         </section>
 
         <!-- Exercice 1 -->
         <section id="ex1" class="card">
-            <h2 class="glow">Exercice 1 - Préparer les données pour John</h2>
+            <h2 class="glow">🔍 Exercice 1 - Préparer les données pour John the Ripper</h2>
+            
+            <h3>1.1 - Extraire les hachés de mots de passe</h3>
             <div class="terminal">
-<pre>
-# Extraire les hachés des comptes test
-sudo awk -F: '/alice|bob|charlie/{print $1":"$2}' /etc/shadow &gt; ~/hashes_course.txt
-sudo chmod 600 ~/hashes_course.txt
+<pre>sudo awk -F: '/alice|bob|charlie/{print $1":"$2}' /etc/shadow &gt; ~/hashes_course.txt</pre>
+            </div>
+            <p><strong>Explication :</strong> Cette commande extrait les noms d'utilisateurs et leurs mots de passe hachés depuis <code>/etc/shadow</code></p>
 
-# Créer une wordlist pédagogique
-cat &gt; ~/wordlist_course.txt &lt;&lt;'EOF'
+            <h3>1.2 - Sécuriser le fichier de hachés</h3>
+            <div class="terminal">
+<pre>sudo chmod 600 ~/hashes_course.txt</pre>
+            </div>
+            <p><strong>Explication :</strong> Seul le propriétaire peut lire/écrire le fichier (sécurité)</p>
+
+            <h3>1.3 - Créer une wordlist pédagogique</h3>
+            <div class="terminal">
+<pre>cat &gt; ~/wordlist_course.txt &lt;&lt;'EOF'
 password
 password123
 Summer2024!
@@ -75,57 +122,116 @@ admin
 Y7$g9Q!kL2#v
 letmein
 qwerty
-EOF
-
-# Vérifier les fichiers
-ls -l ~/hashes_course.txt ~/wordlist_course.txt
-head -n 20 ~/hashes_course.txt
-</pre>
+EOF</pre>
             </div>
+            <p><strong>Explication :</strong> Création d'une liste de mots de passe courants pour les tests</p>
+
+            <h3>1.4 - Vérifier les fichiers créés</h3>
+            <div class="terminal">
+<pre>ls -l ~/hashes_course.txt ~/wordlist_course.txt</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> 2 fichiers listés avec leurs permissions</p>
+
+            <p><strong>Afficher le contenu des hachés :</strong></p>
+            <div class="terminal">
+<pre>head -n 20 ~/hashes_course.txt</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Les lignes avec alice, bob et charlie suivies de leurs hachés SHA-512</p>
+
+            <p><strong>Afficher la wordlist :</strong></p>
+            <div class="terminal">
+<pre>cat ~/wordlist_course.txt</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Liste des 9 mots de passe</p>
         </section>
 
         <!-- Exercice 2 -->
         <section id="ex2" class="card">
-            <h2 class="glow">Exercice 2 - John the Ripper (hors-ligne)</h2>
+            <h2 class="glow">🔨 Exercice 2 - John the Ripper (cassage hors-ligne)</h2>
+            
+            <h3>2.1 - Casser les mots de passe avec la wordlist</h3>
             <div class="terminal">
-<pre>
-# Casser les mots de passe avec wordlist
-john --wordlist=~/wordlist_course.txt ~/hashes_course.txt
-
-# Mode plus agressif avec règles
-john --wordlist=~/wordlist_course.txt --rules ~/hashes_course.txt
-
-# Afficher les mots de passe trouvés
-john --show ~/hashes_course.txt
-
-# Mesurer le temps de cassage
-time john --wordlist=~/wordlist_course.txt ~/hashes_course.txt
-</pre>
+<pre>john --wordlist=~/wordlist_course.txt ~/hashes_course.txt</pre>
             </div>
+            <p><strong>Résultat attendu :</strong> John devrait trouver les mots de passe d'Alice et Bob rapidement</p>
+            <p><strong>Exemple de sortie :</strong></p>
+            <div class="terminal">
+<pre>password123      (alice)
+Summer2024!      (bob)</pre>
+            </div>
+
+            <h3>2.2 - Utiliser les règles de John (plus agressif)</h3>
+            <div class="terminal">
+<pre>john --wordlist=~/wordlist_course.txt --rules ~/hashes_course.txt</pre>
+            </div>
+            <p><strong>Explication :</strong> Les règles appliquent des variations (majuscules, chiffres, caractères spéciaux)</p>
+
+            <h3>2.3 - Afficher tous les mots de passe trouvés</h3>
+            <div class="terminal">
+<pre>john --show ~/hashes_course.txt</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong></p>
+            <div class="terminal">
+<pre>alice:password123
+bob:Summer2024!
+charlie:Y7$g9Q!kL2#v
+
+3 password hashes cracked, 0 left</pre>
+            </div>
+
+            <h3>2.4 - Mesurer le temps de cassage</h3>
+            <div class="terminal">
+<pre>time john --wordlist=~/wordlist_course.txt ~/hashes_course.txt</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Affiche le temps réel, utilisateur et système pour le cassage</p>
         </section>
 
         <!-- Exercice 3 -->
         <section id="ex3" class="card">
-            <h2 class="glow">Exercice 3 - Hydra attaque SSH</h2>
+            <h2 class="glow">🎯 Exercice 3 - Hydra attaque SSH</h2>
+            
+            <h3>3.1 - Lancer une attaque brute force contre Alice</h3>
             <div class="terminal">
-<pre>
-# Attaque brute-force contre SSH
-hydra -l alice -P ~/wordlist_course.txt ssh://127.0.0.1 -t 4
+<pre>hydra -l alice -P ~/wordlist_course.txt ssh://127.0.0.1 -t 4</pre>
+            </div>
+            <p><strong>Explication des paramètres :</strong></p>
+            <ul>
+                <li><code>-l alice</code> : nom d'utilisateur cible</li>
+                <li><code>-P ~/wordlist_course.txt</code> : fichier de mots de passe</li>
+                <li><code>ssh://127.0.0.1</code> : protocole et cible (localhost)</li>
+                <li><code>-t 4</code> : 4 threads parallèles</li>
+            </ul>
+            <p><strong>Résultat attendu :</strong></p>
+            <div class="terminal">
+<pre>[22][ssh] host: 127.0.0.1   login: alice   password: password123</pre>
+            </div>
 
-# Surveiller les logs SSH
-sudo tail -f /var/log/auth.log
-sudo grep 'Failed password' /var/log/auth.log | tail -n 50
-</pre>
+            <h3>3.2 - Surveiller les logs SSH en temps réel</h3>
+            <p><strong>Ouvrir un nouveau terminal et lancer :</strong></p>
+            <div class="terminal">
+<pre>sudo tail -f /var/log/auth.log</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Flux en direct des tentatives de connexion</p>
+
+            <h3>3.3 - Analyser les échecs de connexion</h3>
+            <div class="terminal">
+<pre>sudo grep 'Failed password' /var/log/auth.log | tail -n 50</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Liste des 50 dernières tentatives échouées</p>
+
+            <p><strong>Compter les tentatives échouées :</strong></p>
+            <div class="terminal">
+<pre>sudo grep 'Failed password' /var/log/auth.log | wc -l</pre>
             </div>
         </section>
 
         <!-- Exercice 4 -->
         <section id="ex4" class="card">
-            <h2 class="glow">Exercice 4 - Fail2ban</h2>
+            <h2 class="glow">🛡️ Exercice 4 - Fail2ban</h2>
+            
+            <h3>4.1 - Créer la configuration locale Fail2ban</h3>
             <div class="terminal">
-<pre>
-# Créer configuration locale fail2ban pour SSH
-sudo tee /etc/fail2ban/jail.d/ssh_local.conf &gt;/dev/null &lt;&lt;'EOF'
+<pre>sudo tee /etc/fail2ban/jail.d/ssh_local.conf &gt;/dev/null &lt;&lt;'EOF'
 [sshd]
 enabled = true
 port = ssh
@@ -135,64 +241,243 @@ maxretry = 3
 findtime = 600
 bantime = 3600
 action = iptables-multiport[name=sshd, port="ssh", protocol="tcp"]
-EOF
+EOF</pre>
+            </div>
+            <p><strong>Explication de la configuration :</strong></p>
+            <ul>
+                <li><code>maxretry = 3</code> : 3 tentatives maximum</li>
+                <li><code>findtime = 600</code> : sur 10 minutes (600 secondes)</li>
+                <li><code>bantime = 3600</code> : bannissement de 1 heure (3600 secondes)</li>
+            </ul>
 
-# Redémarrer fail2ban et vérifier
-sudo systemctl restart fail2ban
-sudo fail2ban-client status sshd
+            <h3>4.2 - Redémarrer Fail2ban</h3>
+            <div class="terminal">
+<pre>sudo systemctl restart fail2ban</pre>
+            </div>
+            <p><strong>Vérifier le statut :</strong></p>
+            <div class="terminal">
+<pre>sudo systemctl status fail2ban</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> "active (running)"</p>
 
-# Tester attaque Hydra
-hydra -l alice -P ~/wordlist_course.txt ssh://127.0.0.1
+            <h3>4.3 - Vérifier la configuration SSH dans Fail2ban</h3>
+            <div class="terminal">
+<pre>sudo fail2ban-client status sshd</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong></p>
+            <div class="terminal">
+<pre>Status for the jail: sshd
+|- Filter
+|  |- Currently failed: 0
+|  |- Total failed:     0
+|  `- File list:        /var/log/auth.log
+`- Actions
+   |- Currently banned: 0
+   |- Total banned:     0
+   `- Banned IP list:</pre>
+            </div>
 
-# Vérifier IP bannie
-sudo fail2ban-client whois sshd 127.0.0.1
-</pre>
+            <h3>4.4 - Tester l'attaque Hydra avec Fail2ban actif</h3>
+            <div class="terminal">
+<pre>hydra -l alice -P ~/wordlist_course.txt ssh://127.0.0.1 -t 4</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Après 3 tentatives, Hydra sera bloqué par Fail2ban</p>
+
+            <h3>4.5 - Vérifier que l'IP est bannie</h3>
+            <div class="terminal">
+<pre>sudo fail2ban-client status sshd</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> 127.0.0.1 devrait apparaître dans "Banned IP list"</p>
+
+            <p><strong>Voir les détails du bannissement :</strong></p>
+            <div class="terminal">
+<pre>sudo fail2ban-client get sshd banip</pre>
+            </div>
+
+            <h3>4.6 - Débannir l'IP (si nécessaire)</h3>
+            <div class="terminal">
+<pre>sudo fail2ban-client set sshd unbanip 127.0.0.1</pre>
             </div>
         </section>
 
         <!-- Exercice 5 -->
         <section id="ex5" class="card">
-            <h2 class="glow">Exercice 5 - Authentification par clé SSH</h2>
+            <h2 class="glow">🔑 Exercice 5 - Authentification par clé SSH</h2>
+            
+            <h3>5.1 - Générer une paire de clés SSH</h3>
             <div class="terminal">
-<pre>
-# Générer paire de clés SSH
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_course -N ""
-
-# Installer la clé pour l'utilisateur bob
-sudo mkdir -p /home/bob/.ssh
-sudo cp ~/.ssh/id_ed25519_course.pub /home/bob/.ssh/authorized_keys
-sudo chown -R bob:bob /home/bob/.ssh
-sudo chmod 700 /home/bob/.ssh
-sudo chmod 600 /home/bob/.ssh/authorized_keys
-
-# Désactiver mot de passe pour SSH
-sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-sudo systemctl restart ssh
-
-# Tester connexion par clé
-ssh -i ~/.ssh/id_ed25519_course bob@127.0.0.1
-
-# Hydra échoue maintenant
-hydra -l bob -P ~/wordlist_course.txt ssh://127.0.0.1
-</pre>
+<pre>ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_course -N ""</pre>
             </div>
+            <p><strong>Explication des paramètres :</strong></p>
+            <ul>
+                <li><code>-t ed25519</code> : algorithme moderne et sécurisé</li>
+                <li><code>-f ~/.ssh/id_ed25519_course</code> : nom du fichier</li>
+                <li><code>-N ""</code> : pas de phrase de passe (pour le TP uniquement)</li>
+            </ul>
+            <p><strong>Résultat attendu :</strong> 2 fichiers créés</p>
+            <ul>
+                <li><code>~/.ssh/id_ed25519_course</code> (clé privée)</li>
+                <li><code>~/.ssh/id_ed25519_course.pub</code> (clé publique)</li>
+            </ul>
+
+            <h3>5.2 - Vérifier les clés générées</h3>
+            <div class="terminal">
+<pre>ls -l ~/.ssh/id_ed25519_course*</pre>
+            </div>
+
+            <h3>5.3 - Installer la clé publique pour Bob</h3>
+            <p><strong>Créer le répertoire .ssh pour Bob :</strong></p>
+            <div class="terminal">
+<pre>sudo mkdir -p /home/bob/.ssh</pre>
+            </div>
+
+            <p><strong>Copier la clé publique :</strong></p>
+            <div class="terminal">
+<pre>sudo cp ~/.ssh/id_ed25519_course.pub /home/bob/.ssh/authorized_keys</pre>
+            </div>
+
+            <p><strong>Définir les bonnes permissions :</strong></p>
+            <div class="terminal">
+<pre>sudo chown -R bob:bob /home/bob/.ssh
+sudo chmod 700 /home/bob/.ssh
+sudo chmod 600 /home/bob/.ssh/authorized_keys</pre>
+            </div>
+            <p><strong>Explication des permissions :</strong></p>
+            <ul>
+                <li><code>700</code> sur <code>.ssh</code> : seul Bob peut lire/écrire/exécuter</li>
+                <li><code>600</code> sur <code>authorized_keys</code> : seul Bob peut lire/écrire</li>
+            </ul>
+
+            <h3>5.4 - Désactiver l'authentification par mot de passe</h3>
+            <div class="terminal">
+<pre>sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config</pre>
+            </div>
+
+            <p><strong>Vérifier la modification :</strong></p>
+            <div class="terminal">
+<pre>sudo grep "PasswordAuthentication" /etc/ssh/sshd_config</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> <code>PasswordAuthentication no</code></p>
+
+            <p><strong>Redémarrer SSH :</strong></p>
+            <div class="terminal">
+<pre>sudo systemctl restart ssh</pre>
+            </div>
+
+            <h3>5.5 - Tester la connexion par clé</h3>
+            <div class="terminal">
+<pre>ssh -i ~/.ssh/id_ed25519_course bob@127.0.0.1</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Connexion réussie sans demande de mot de passe</p>
+
+            <p><strong>Se déconnecter :</strong></p>
+            <div class="terminal">
+<pre>exit</pre>
+            </div>
+
+            <h3>5.6 - Vérifier qu'Hydra échoue maintenant</h3>
+            <div class="terminal">
+<pre>hydra -l bob -P ~/wordlist_course.txt ssh://127.0.0.1 -t 4</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Hydra ne peut plus se connecter car l'authentification par mot de passe est désactivée</p>
         </section>
 
         <!-- Restauration -->
         <section id="restore" class="card">
-            <h2 class="glow">Restauration</h2>
+            <h2 class="glow">🔄 Restauration du système</h2>
+            
+            <h3>R.1 - Réactiver l'authentification par mot de passe</h3>
             <div class="terminal">
-<pre>
-# Réactiver mot de passe SSH
-sudo sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-sudo systemctl restart ssh
-
-# Supprimer utilisateurs test
-sudo deluser --remove-home alice
-sudo deluser --remove-home bob
-sudo deluser --remove-home charlie
-</pre>
+<pre>sudo sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config</pre>
             </div>
+
+            <p><strong>Redémarrer SSH :</strong></p>
+            <div class="terminal">
+<pre>sudo systemctl restart ssh</pre>
+            </div>
+
+            <h3>R.2 - Supprimer les utilisateurs de test</h3>
+            <p><strong>Supprimer Alice :</strong></p>
+            <div class="terminal">
+<pre>sudo deluser --remove-home alice</pre>
+            </div>
+
+            <p><strong>Supprimer Bob :</strong></p>
+            <div class="terminal">
+<pre>sudo deluser --remove-home bob</pre>
+            </div>
+
+            <p><strong>Supprimer Charlie :</strong></p>
+            <div class="terminal">
+<pre>sudo deluser --remove-home charlie</pre>
+            </div>
+
+            <p><strong>Vérifier la suppression :</strong></p>
+            <div class="terminal">
+<pre>cat /etc/passwd | grep -E "alice|bob|charlie"</pre>
+            </div>
+            <p><strong>Résultat attendu :</strong> Aucune ligne affichée</p>
+
+            <h3>R.3 - Nettoyer les fichiers de test</h3>
+            <div class="terminal">
+<pre>rm ~/hashes_course.txt
+rm ~/wordlist_course.txt
+rm ~/.ssh/id_ed25519_course*</pre>
+            </div>
+
+            <h3>R.4 - Désactiver la configuration Fail2ban personnalisée (optionnel)</h3>
+            <div class="terminal">
+<pre>sudo rm /etc/fail2ban/jail.d/ssh_local.conf
+sudo systemctl restart fail2ban</pre>
+            </div>
+        </section>
+
+        <!-- Résumé -->
+        <section class="card">
+            <h2 class="glow">📊 Résumé des compétences acquises</h2>
+            <h3>✅ Vous avez appris à :</h3>
+            <ol>
+                <li>Configurer un environnement de test SSH sécurisé</li>
+                <li>Extraire et manipuler des hachés de mots de passe</li>
+                <li>Utiliser John the Ripper pour casser des mots de passe</li>
+                <li>Effectuer des attaques brute force avec Hydra</li>
+                <li>Protéger SSH avec Fail2ban</li>
+                <li>Configurer l'authentification par clé SSH</li>
+                <li>Analyser les logs de sécurité</li>
+            </ol>
+        </section>
+
+        <!-- Bonnes pratiques -->
+        <section class="card">
+            <h2 class="glow">🎓 Bonnes pratiques SSH en production</h2>
+            <ol>
+                <li>Toujours utiliser l'authentification par clé SSH</li>
+                <li>Désactiver l'authentification par mot de passe</li>
+                <li>Changer le port SSH par défaut (22)</li>
+                <li>Utiliser Fail2ban ou des outils similaires</li>
+                <li>Limiter les utilisateurs autorisés à se connecter via SSH</li>
+                <li>Utiliser des mots de passe forts (20+ caractères)</li>
+                <li>Activer l'authentification à deux facteurs (2FA)</li>
+                <li>Surveiller régulièrement les logs</li>
+            </ol>
+        </section>
+
+        <!-- Ressources -->
+        <section class="card">
+            <h2 class="glow">📚 Ressources complémentaires</h2>
+            <ul>
+                <li>Documentation officielle John the Ripper : <a href="https://www.openwall.com/john/" target="_blank">https://www.openwall.com/john/</a></li>
+                <li>Documentation Hydra : <a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank">https://github.com/vanhauser-thc/thc-hydra</a></li>
+                <li>Guide Fail2ban : <a href="https://www.fail2ban.org/" target="_blank">https://www.fail2ban.org/</a></li>
+                <li>Sécurité SSH : <a href="https://www.openssh.com/" target="_blank">https://www.openssh.com/</a></li>
+            </ul>
+        </section>
+
+        <!-- Rappel légal -->
+        <section class="card">
+            <h2 class="glow">⚖️ Rappel légal</h2>
+            <p>L'utilisation de ces techniques sur des systèmes sans autorisation explicite est <strong>ILLÉGALE</strong> et peut entraîner des poursuites judiciaires. Ce TP est à des fins éducatives uniquement dans un environnement contrôlé.</p>
+            <p><strong>🎯 Fin du guide - Bon apprentissage !</strong></p>
         </section>
     </div>
 </body>
